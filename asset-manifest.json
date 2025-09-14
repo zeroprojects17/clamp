@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/clamp/static/css/main.4d4f0b69.css",
+    "main.js": "/clamp/static/js/main.fc01bb22.js",
+    "static/js/453.431f9162.chunk.js": "/clamp/static/js/453.431f9162.chunk.js",
+    "index.html": "/clamp/index.html",
+    "main.4d4f0b69.css.map": "/clamp/static/css/main.4d4f0b69.css.map",
+    "main.fc01bb22.js.map": "/clamp/static/js/main.fc01bb22.js.map",
+    "453.431f9162.chunk.js.map": "/clamp/static/js/453.431f9162.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4d4f0b69.css",
+    "static/js/main.fc01bb22.js"
+  ]
+}
