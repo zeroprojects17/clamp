@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/clampv2/static/css/main.0ba6c1d5.css",
-    "main.js": "/clampv2/static/js/main.44e7d8bb.js",
-    "static/js/453.0a1f1b2d.chunk.js": "/clampv2/static/js/453.0a1f1b2d.chunk.js",
-    "index.html": "/clampv2/index.html",
-    "main.0ba6c1d5.css.map": "/clampv2/static/css/main.0ba6c1d5.css.map",
-    "main.44e7d8bb.js.map": "/clampv2/static/js/main.44e7d8bb.js.map",
-    "453.0a1f1b2d.chunk.js.map": "/clampv2/static/js/453.0a1f1b2d.chunk.js.map"
+    "main.css": "/clamp/static/css/main.4d4f0b69.css",
+    "main.js": "/clamp/static/js/main.e6352c9a.js",
+    "static/js/453.a56f8454.chunk.js": "/clamp/static/js/453.a56f8454.chunk.js",
+    "index.html": "/clamp/index.html",
+    "main.4d4f0b69.css.map": "/clamp/static/css/main.4d4f0b69.css.map",
+    "main.e6352c9a.js.map": "/clamp/static/js/main.e6352c9a.js.map",
+    "453.a56f8454.chunk.js.map": "/clamp/static/js/453.a56f8454.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0ba6c1d5.css",
-    "static/js/main.44e7d8bb.js"
+    "static/css/main.4d4f0b69.css",
+    "static/js/main.e6352c9a.js"
   ]
 }
