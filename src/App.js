@@ -9,7 +9,12 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+} from "firebase/database";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -17,7 +22,7 @@ import {
   signOut,
 } from "firebase/auth";
 
-// 🔹 Firebase Config (from .env)
+// 🔹 Firebase Config
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -29,13 +34,13 @@ const firebaseConfig = {
 };
 
 const App = () => {
-  // Authentication
+  // Auth state
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
 
-  // Clamp Data
+  // Clamp data
   const [deviceData, setDeviceData] = useState({
     __connected: "disconnected",
     current_now: "0.000",
@@ -47,7 +52,10 @@ const App = () => {
   const [auth, setAuth] = useState(null);
   const [status, setStatus] = useState("Disconnected");
 
-  // 🔹 Init Firebase
+  // Simulate state
+  const [simulating, setSimulating] = useState(false);
+
+  // Firebase init
   useEffect(() => {
     let app, database, authService;
     try {
@@ -61,7 +69,7 @@ const App = () => {
       setDb(database);
       setAuth(authService);
 
-      // Auth listener
+      // Listen for auth
       onAuthStateChanged(authService, (currentUser) => {
         setUser(currentUser);
       });
@@ -70,7 +78,7 @@ const App = () => {
     }
   }, []);
 
-  // 🔹 Listen to Clamp Data
+  // Listen to clamp data
   useEffect(() => {
     if (db && user) {
       const dataRef = ref(db, "/");
@@ -131,12 +139,29 @@ const App = () => {
     }
   };
 
-  // 🔹 Login Page
+  // 🔹 Start simulation
+  const startSimulation = () => {
+    if (!db) return;
+    setSimulating(true);
+    set(ref(db, "current_now"), "0.0711");
+    setTimeout(() => {
+      set(ref(db, "current_now"), "0.072");
+    }, 1000);
+  };
+
+  // 🔹 Stop simulation
+  const stopSimulation = () => {
+    if (!db) return;
+    setSimulating(false);
+    set(ref(db, "current_now"), "0.000");
+  };
+
+  // 🔹 If not logged in
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
         <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm">
-          <h1 className="text-xl font-bold text-gray-800 mb-4 flex items-center justify-center">
+          <h1 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
             <LogIn className="mr-2 text-indigo-600" />
             Clamp Login
           </h1>
@@ -146,21 +171,21 @@ const App = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
             />
             {loginError && (
               <p className="text-sm text-red-500">{loginError}</p>
             )}
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 text-sm"
+              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700"
             >
               Sign In
             </button>
@@ -170,21 +195,19 @@ const App = () => {
     );
   }
 
-  // 🔹 Dashboard
+  // 🔹 Main dashboard
   return (
-    <div className="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 flex items-center justify-center">
+      <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-3xl">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-6 gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold flex items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-center border-b pb-4 mb-6 space-y-3 sm:space-y-0">
+          <h1 className="text-2xl font-bold flex items-center">
             <Power className="mr-2 text-indigo-600" /> Clamp Monitor
           </h1>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            <span className="text-sm text-gray-600 break-all">
-              {user.email}
-            </span>
+          <div className="flex items-center space-x-4 text-sm">
+            <span className="text-gray-600">User: {user.email}</span>
             <span
-              className={`px-3 py-1 rounded-full text-xs sm:text-sm ${
+              className={`px-3 py-1 rounded-full ${
                 status === "Connected"
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"
@@ -194,42 +217,61 @@ const App = () => {
             </span>
             <button
               onClick={handleLogout}
-              className="flex items-center text-gray-600 hover:text-gray-800 text-sm"
+              className="flex items-center text-gray-600 hover:text-gray-800"
             >
-              <LogOut size={16} className="mr-1" /> Logout
+              <LogOut size={18} className="mr-1" /> Logout
             </button>
           </div>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 bg-gray-50 rounded-xl flex flex-col items-center">
-            <Gauge className="text-indigo-600 mb-2" size={28} />
-            <p className="text-xs sm:text-sm text-gray-500">Current (A)</p>
-            <p className="text-2xl font-bold">{deviceData.current_now}</p>
+        {/* Data Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="p-6 bg-gray-50 rounded-xl flex flex-col items-center">
+            <Gauge className="text-indigo-600 mb-2" size={32} />
+            <p className="text-sm text-gray-500">Current (A)</p>
+            <p className="text-3xl font-bold">{deviceData.current_now}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-xl flex flex-col items-center">
-            <Layers className="text-indigo-600 mb-2" size={28} />
-            <p className="text-xs sm:text-sm text-gray-500">Unit (kWh)</p>
-            <p className="text-2xl font-bold">{deviceData.unit}</p>
+          <div className="p-6 bg-gray-50 rounded-xl flex flex-col items-center">
+            <Layers className="text-indigo-600 mb-2" size={32} />
+            <p className="text-sm text-gray-500">Unit (kWh)</p>
+            <p className="text-3xl font-bold">{deviceData.unit}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-xl flex flex-col items-center">
-            <Activity className="text-indigo-600 mb-2" size={28} />
-            <p className="text-xs sm:text-sm text-gray-500">Mode</p>
-            <p className="text-lg font-semibold">{deviceData.mode}</p>
+          <div className="p-6 bg-gray-50 rounded-xl flex flex-col items-center">
+            <Activity className="text-indigo-600 mb-2" size={32} />
+            <p className="text-sm text-gray-500">Mode</p>
+            <p className="text-xl font-semibold">{deviceData.mode}</p>
             <button
               onClick={toggleMode}
-              className="mt-3 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center text-sm"
+              className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center"
             >
-              <RefreshCw size={14} className="mr-2" />
+              <RefreshCw size={16} className="mr-2" />
               Toggle Mode
             </button>
           </div>
-          <div className="p-4 bg-gray-50 rounded-xl flex flex-col items-center">
-            <Power className="text-indigo-600 mb-2" size={28} />
-            <p className="text-xs sm:text-sm text-gray-500">Connection</p>
-            <p className="text-lg font-semibold">{deviceData.__connected}</p>
+          <div className="p-6 bg-gray-50 rounded-xl flex flex-col items-center">
+            <Power className="text-indigo-600 mb-2" size={32} />
+            <p className="text-sm text-gray-500">Connection</p>
+            <p className="text-xl font-semibold">{deviceData.__connected}</p>
           </div>
+        </div>
+
+        {/* Simulate Buttons */}
+        <div className="flex flex-col items-center mt-6 space-y-3">
+          {!simulating ? (
+            <button
+              onClick={startSimulation}
+              className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition"
+            >
+              ▶ Start Simulation
+            </button>
+          ) : (
+            <button
+              onClick={stopSimulation}
+              className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow hover:bg-red-700 transition"
+            >
+              ⏹ Stop Simulation
+            </button>
+          )}
         </div>
       </div>
     </div>
